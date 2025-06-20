@@ -77,12 +77,12 @@ public class TransferUtilityClient : IDisposable
     {
         try
         {
-            Console.WriteLine($"Starting download: s3Key={s3Key}, localPath={localPath}, taskCount={allTasks.Count()}");
+            Logger.LogVerbose($"Starting download: s3Key={s3Key}, localPath={localPath}, taskCount={allTasks.Count()}");
             
             // If we have multiple tasks, use directory download
             if (_filesOnDisk && allTasks != null && allTasks.Count() > 1)
             {
-                Console.WriteLine($"Using directory download");
+                Logger.LogVerbose($"Using directory download");
                 var commonRoot = GetCommonRootDirectory(allTasks);
                 var localDir = Path.GetDirectoryName(localPath);
 
@@ -95,13 +95,13 @@ public class TransferUtilityClient : IDisposable
                     DownloadFilesConcurrently = true
                 };
 
-                Console.WriteLine($"Directory download request: bucket={_bucketName}, localDir={localDir}, s3Dir={commonRoot}");
+                Logger.LogVerbose($"Directory download request: bucket={_bucketName}, localDir={localDir}, s3Dir={commonRoot}");
                 await _transferUtility.DownloadDirectoryAsync(downloadRequest);
-                Console.WriteLine("Directory download complete");
+                Logger.LogVerbose("Directory download complete");
             }
             else if (_filesOnDisk)
             {   
-                Console.WriteLine($"Using single file download");
+                Logger.LogVerbose($"Using single file download");
                 // Download the file
                 var downloadRequest = new TransferUtilityDownloadRequest
                 {
@@ -110,12 +110,12 @@ public class TransferUtilityClient : IDisposable
                     FilePath = localPath,
                 };
 
-                Console.WriteLine($"Download request: bucket={_bucketName}, key={s3Key}, file={localPath}");
+                Logger.LogVerbose($"Download request: bucket={_bucketName}, key={s3Key}, file={localPath}");
                 await _transferUtility.DownloadAsync(downloadRequest);
                 
                 // Add file size check
                 var fileInfo = new FileInfo(localPath);
-                Console.WriteLine($"Download complete: Size={fileInfo.Length:N0} bytes");
+                Logger.LogVerbose($"Download complete: Size={fileInfo.Length:N0} bytes");
             }
             else
             {
@@ -136,8 +136,8 @@ public class TransferUtilityClient : IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Download failed: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            Logger.LogAlways($"Download failed: {ex.Message}");
+            Logger.LogVerbose($"Stack trace: {ex.StackTrace}");
             return false;
         }
     }
@@ -203,8 +203,10 @@ public class TransferUtilityClient : IDisposable
 
             return true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Logger.LogAlways($"Upload failed: {ex.Message}");
+            Logger.LogVerbose($"Stack trace: {ex.StackTrace}");
             return false;
         }
     }

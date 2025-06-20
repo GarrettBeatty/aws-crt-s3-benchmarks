@@ -30,13 +30,18 @@ public class Program
             name: "target-throughput",
             description: "Target throughput in Gbps");
 
+        var verboseOption = new Option<bool>(
+            name: "--verbose",
+            description: "Enable verbose logging");
+
         var rootCommand = new RootCommand("S3 benchmark runner for .NET SDK")
         {
             s3ClientArg,
             workloadArg,
             bucketArg,
             regionArg,
-            targetThroughputArg
+            targetThroughputArg,
+            verboseOption
         };
 
         rootCommand.Description = @"S3 benchmark runner for .NET SDK
@@ -51,10 +56,14 @@ Arguments:
   region            AWS region (e.g. us-west-2)
   target-throughput Target throughput in Gbps";
 
-        rootCommand.SetHandler(async (s3Client, workload, bucket, region, targetThroughput) =>
+        rootCommand.SetHandler(
+            async (string s3Client, FileInfo workload, string bucket, string region, double targetThroughput, bool verbose) =>
         {
             try
             {
+                // Initialize logger
+                Logger.Initialize(verbose);
+
                 // Validate S3 client type
                 if (s3Client != "sdk-dotnet-tm")
                 {
@@ -67,20 +76,20 @@ Arguments:
                     ?? throw new InvalidOperationException("Failed to parse workload config");
 
                 // Log workload configuration
-                Console.WriteLine("\nWorkload Configuration:");
-                Console.WriteLine($"- MaxRepeatCount: {workloadConfig.MaxRepeatCount}");
-                Console.WriteLine($"- MaxRepeatSecs: {workloadConfig.MaxRepeatSecs}");
-                Console.WriteLine($"- FilesOnDisk: {workloadConfig.FilesOnDisk}");
-                Console.WriteLine("\nTasks:");
+                Logger.LogVerbose("\nWorkload Configuration:");
+                Logger.LogVerbose($"- MaxRepeatCount: {workloadConfig.MaxRepeatCount}");
+                Logger.LogVerbose($"- MaxRepeatSecs: {workloadConfig.MaxRepeatSecs}");
+                Logger.LogVerbose($"- FilesOnDisk: {workloadConfig.FilesOnDisk}");
+                Logger.LogVerbose("\nTasks:");
                 foreach (var task in workloadConfig.Tasks)
                 {
-                    Console.WriteLine($"- Task: action={task.Action}, size={task.Size:N0} bytes, key={task.S3Key}");
+                    Logger.LogVerbose($"- Task: action={task.Action}, size={task.Size:N0} bytes, key={task.S3Key}");
                 }
-                Console.WriteLine();
+                Logger.LogVerbose("");
 
                 // Calculate total bytes per run (sum of all task sizes)
                 var bytesPerRun = workloadConfig.Tasks.Sum(t => t.Size);
-                Console.WriteLine($"Total bytes per run: {bytesPerRun:N0}\n");
+                Logger.LogVerbose($"Total bytes per run: {bytesPerRun:N0}\n");
 
                 // Create benchmark runner
                 var benchmarkRunner = new TransferUtilityBenchmarkRunner(workloadConfig, bucket, region, targetThroughput);
@@ -110,9 +119,9 @@ Arguments:
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"\nError during run {run}:");
-                        Console.WriteLine($"- Message: {ex.Message}");
-                        Console.WriteLine($"- Stack trace: {ex.StackTrace}\n");
+                        Logger.LogAlways($"\nError during run {run}:");
+                        Logger.LogAlways($"- Message: {ex.Message}");
+                        Logger.LogVerbose($"- Stack trace: {ex.StackTrace}\n");
                         success = false;
                         Environment.ExitCode = 1;
                         break;
@@ -137,18 +146,18 @@ Arguments:
                     };
 
                     // Write console format to stdout for user display
-                    Console.WriteLine(runResult.ToConsoleString());
+                    Logger.LogAlways(runResult.ToConsoleString());
                 }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"\nError:");
-                Console.Error.WriteLine($"- Message: {ex.Message}");
-                Console.Error.WriteLine($"- Stack trace: {ex.StackTrace}\n");
+                Logger.LogAlways($"\nError:");
+                Logger.LogAlways($"- Message: {ex.Message}");
+                Logger.LogVerbose($"- Stack trace: {ex.StackTrace}\n");
                 Environment.ExitCode = 1;
             }
         },
-        s3ClientArg, workloadArg, bucketArg, regionArg, targetThroughputArg);
+        s3ClientArg, workloadArg, bucketArg, regionArg, targetThroughputArg, verboseOption);
 
         return await rootCommand.InvokeAsync(args);
     }
