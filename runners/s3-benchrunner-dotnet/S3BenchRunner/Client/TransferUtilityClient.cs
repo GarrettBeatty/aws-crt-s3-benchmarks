@@ -22,14 +22,14 @@ public class TransferUtilityClient : IDisposable
             RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(region),
             // Use path style addressing for compatibility with benchmark infrastructure
             ForcePathStyle = true,
-            LogResponse = true,
-            LogMetrics = true
+            // LogResponse = true,
+            // LogMetrics = true
         };
         _s3Client = new AmazonS3Client(config);
         // Configure transfer utility with concurrent requests based on number of tasks
         _transferConfig = new TransferUtilityConfig
         {
-            ConcurrentServiceRequests = 8 // TODO possibly update
+            ConcurrentServiceRequests = 100 // TODO possibly update
         };
         _transferUtility = new TransferUtility(_s3Client, _transferConfig);
         _filesOnDisk = filesOnDisk;
