@@ -29,7 +29,7 @@ public class TransferUtilityClient : IDisposable
         // Configure transfer utility with concurrent requests based on number of tasks
         _transferConfig = new TransferUtilityConfig
         {
-            ConcurrentServiceRequests = 100 // TODO possibly update
+            ConcurrentServiceRequests = 8,
         };
         _transferUtility = new TransferUtility(_s3Client, _transferConfig);
         _filesOnDisk = filesOnDisk;
