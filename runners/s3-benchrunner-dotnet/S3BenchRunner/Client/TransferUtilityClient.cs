@@ -127,7 +127,14 @@ public class TransferUtilityClient : IDisposable
         catch (Exception ex)
         {
             Console.WriteLine($"Download failed: {ex.Message}");
-            // Logger.LogVerbose($"Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                Console.WriteLine($"Inner exception type: {ex.InnerException.GetType().Name}");
+                if (ex.InnerException.StackTrace != null)
+                    Console.WriteLine($"Inner stack trace: {ex.InnerException.StackTrace}");
+            }
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
             return false;
         }
     }
