@@ -103,7 +103,7 @@ public class TransferUtilityClient : IDisposable
 
 
                 // Pre-allocate single buffer (reused across all reads)
-                var buffer = new byte[65536]; 
+                var buffer = new byte[81920]; 
                 int bytesRead;
 
                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
