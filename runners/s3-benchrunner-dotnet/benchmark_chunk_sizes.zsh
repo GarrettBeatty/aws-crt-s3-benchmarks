@@ -87,6 +87,11 @@ for part_size in "${PART_SIZES[@]}"; do
     part_size_fmt=$(format_bytes $part_size)
     
     for chunk_size in "${CHUNK_SIZES[@]}"; do
+        # Skip invalid combinations where chunk size exceeds part size
+        if [ $chunk_size -gt $part_size ]; then
+            continue
+        fi
+        
         current_test=$((current_test + 1))
         chunk_size_fmt=$(format_bytes $chunk_size)
         
