@@ -26,8 +26,7 @@ public class TransferUtilityClient : IDisposable
 
         var config = new AmazonS3Config
         {
-            RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(region),
-            BufferSize = 65536  // 64KB instead of default 8192
+            RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(region)
         };
 
 
