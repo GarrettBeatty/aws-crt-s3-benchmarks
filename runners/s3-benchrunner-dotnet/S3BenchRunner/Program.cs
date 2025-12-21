@@ -38,13 +38,23 @@ public class Program
             name: "target-throughput",
             description: "Target throughput in Gbps");
 
+        var chunkSizeOption = new Option<int?>(
+            name: "--chunk-size",
+            description: "Chunk buffer size in bytes for streaming downloads (e.g., 65536 for 64KB, 8388608 for 8MB)");
+
+        var partSizeOption = new Option<long?>(
+            name: "--part-size",
+            description: "Part size in bytes for multipart operations (e.g., 8388608 for 8MB)");
+
         var rootCommand = new RootCommand("S3 benchmark runner for .NET SDK")
         {
             s3ClientArg,
             workloadArg,
             bucketArg,
             regionArg,
-            targetThroughputArg
+            targetThroughputArg,
+            chunkSizeOption,
+            partSizeOption
         };
 
         rootCommand.Description = @"S3 benchmark runner for .NET SDK
@@ -57,9 +67,13 @@ Arguments:
   workload          Path to workload .run.json file
   bucket            S3 bucket name
   region            AWS region (e.g. us-west-2)
-  target-throughput Target throughput in Gbps";
+  target-throughput Target throughput in Gbps
 
-        rootCommand.SetHandler(async (s3Client, workload, bucket, region, targetThroughput) =>
+Options:
+  --chunk-size      Chunk buffer size in bytes (e.g., 65536 for 64KB, 8388608 for 8MB)
+  --part-size       Part size in bytes (e.g., 8388608 for 8MB)";
+
+        rootCommand.SetHandler(async (s3Client, workload, bucket, region, targetThroughput, chunkSize, partSize) =>
         {
             try
             {
@@ -90,8 +104,19 @@ Arguments:
                 var bytesPerRun = workloadConfig.Tasks.Sum(t => t.Size);
                 Console.WriteLine($"Total bytes per run: {bytesPerRun:N0}\n");
 
+                // Log chunk size and part size if provided
+                if (chunkSize.HasValue)
+                {
+                    Console.WriteLine($"Chunk buffer size: {chunkSize.Value:N0} bytes");
+                }
+                if (partSize.HasValue)
+                {
+                    Console.WriteLine($"Part size: {partSize.Value:N0} bytes");
+                }
+                Console.WriteLine();
+
                 // Create benchmark runner
-                var benchmarkRunner = new TransferUtilityBenchmarkRunner(workloadConfig, bucket, region, targetThroughput);
+                var benchmarkRunner = new TransferUtilityBenchmarkRunner(workloadConfig, bucket, region, targetThroughput, chunkSize, partSize);
 
                 // Track overall start time for max duration check
                 var appStartTime = DateTimeOffset.UtcNow;
@@ -156,7 +181,7 @@ Arguments:
                 Environment.ExitCode = 1;
             }
         },
-        s3ClientArg, workloadArg, bucketArg, regionArg, targetThroughputArg);
+        s3ClientArg, workloadArg, bucketArg, regionArg, targetThroughputArg, chunkSizeOption, partSizeOption);
 
         return await rootCommand.InvokeAsync(args);
     }

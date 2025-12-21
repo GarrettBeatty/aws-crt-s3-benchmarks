@@ -13,11 +13,16 @@ public class TransferUtilityClient : IDisposable
     private readonly string _bucketName;
     private readonly bool _filesOnDisk;
     private readonly TransferUtilityConfig _transferConfig;
+    private readonly int? _chunkSize;
+    private readonly long? _partSize;
     private long  largestUploadSize = 0;
 
-    public TransferUtilityClient(string bucketName, string region, bool filesOnDisk, IEnumerable<WorkloadTask> tasks)
+    public TransferUtilityClient(string bucketName, string region, bool filesOnDisk, IEnumerable<WorkloadTask> tasks,
+        int? chunkSize = null, long? partSize = null)
     {
         _bucketName = bucketName;
+        _chunkSize = chunkSize;
+        _partSize = partSize;
 
         var config = new AmazonS3Config
         {
@@ -32,6 +37,7 @@ public class TransferUtilityClient : IDisposable
         {
             ConcurrentServiceRequests = 100
         };
+        
         _transferUtility = new TransferUtility(_s3Client, _transferConfig);
         _filesOnDisk = filesOnDisk;
 
@@ -78,6 +84,18 @@ public class TransferUtilityClient : IDisposable
                     BucketName = _bucketName,
                     Key = s3Key
                 };
+                
+                // Apply chunk size if provided
+                if (_chunkSize.HasValue)
+                {
+                    streamRequest.ChunkBufferSize = _chunkSize.Value;
+                }
+                
+                // Apply part size if provided
+                if (_partSize.HasValue)
+                {
+                    streamRequest.PartSize = _partSize.Value;
+                }
 
                 // // Open stream from S3 and copy to null stream
                 // using var response = await _transferUtility.OpenStreamAsync(streamRequest);
