@@ -282,7 +282,7 @@ def generate_sdk_recommendations(optimal_configs: List[Dict], output_dir: Path):
     
     # Save to file
     output_path = output_dir / 'sdk_recommendations.txt'
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(recommendations))
     
     print(f"Saved: {output_path}")
@@ -364,7 +364,7 @@ def generate_summary_report(df: pd.DataFrame, optimal_configs: List[Dict],
     
     # Save report
     output_path = output_dir / 'analysis_report.txt'
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(report))
     
     print(f"Saved: {output_path}")
