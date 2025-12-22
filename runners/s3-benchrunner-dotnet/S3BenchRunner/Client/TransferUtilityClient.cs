@@ -1,6 +1,7 @@
 using Amazon.S3;
 using Amazon.S3.Transfer;
 using S3BenchRunner.Models;
+using S3BenchRunner.Mock;
 using System.IO;
 
 
@@ -18,11 +19,27 @@ public class TransferUtilityClient : IDisposable
     private long  largestUploadSize = 0;
 
     public TransferUtilityClient(string bucketName, string region, bool filesOnDisk, IEnumerable<WorkloadTask> tasks,
-        int? chunkSize = null, long? partSize = null)
+        int? chunkSize = null, long? partSize = null, bool useMock = false)
     {
         _bucketName = bucketName;
         _chunkSize = chunkSize;
         _partSize = partSize;
+
+        // Configure mock HTTP factory if requested
+        if (useMock)
+        {
+            // Find the largest download size from tasks (for mock HTTP responses)
+            var largestDownloadSize = tasks
+                .Where(t => t.Action == "download")
+                .DefaultIfEmpty(new WorkloadTask { Size = 0 })
+                .Max(t => t.Size);
+            
+            // Use part size if provided, otherwise use default 8MB
+            var effectivePartSize = partSize ?? 8388608; // 8MB default
+            
+            // Set up mock HTTP client factory before creating S3 client
+            Amazon.AWSConfigs.HttpClientFactory = new MockHttpClientFactory(largestDownloadSize, effectivePartSize);
+        }
 
         var config = new AmazonS3Config
         {

@@ -8,10 +8,10 @@ public class TransferUtilityBenchmarkRunner : BenchmarkRunner
     private readonly TransferUtilityClient _client;
 
     public TransferUtilityBenchmarkRunner(WorkloadConfig config, string bucket, string region, double targetThroughputGbps, 
-        int? chunkSize = null, long? partSize = null)
+        int? chunkSize = null, long? partSize = null, bool useMock = false)
         : base(config, bucket, region)
     {
-        _client = new TransferUtilityClient(bucket, region, config.FilesOnDisk, config.Tasks, chunkSize, partSize);
+        _client = new TransferUtilityClient(bucket, region, config.FilesOnDisk, config.Tasks, chunkSize, partSize, useMock);
     }
 
     public override async Task RunAsync()

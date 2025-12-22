@@ -46,6 +46,10 @@ public class Program
             name: "--part-size",
             description: "Part size in bytes for multipart operations (e.g., 8388608 for 8MB)");
 
+        var mockOption = new Option<bool>(
+            name: "--mock",
+            description: "Use mock HTTP handler to eliminate network I/O (for CPU/memory benchmarking)");
+
         var rootCommand = new RootCommand("S3 benchmark runner for .NET SDK")
         {
             s3ClientArg,
@@ -54,7 +58,8 @@ public class Program
             regionArg,
             targetThroughputArg,
             chunkSizeOption,
-            partSizeOption
+            partSizeOption,
+            mockOption
         };
 
         rootCommand.Description = @"S3 benchmark runner for .NET SDK
@@ -71,9 +76,10 @@ Arguments:
 
 Options:
   --chunk-size      Chunk buffer size in bytes (e.g., 65536 for 64KB, 8388608 for 8MB)
-  --part-size       Part size in bytes (e.g., 8388608 for 8MB)";
+  --part-size       Part size in bytes (e.g., 8388608 for 8MB)
+  --mock            Use mock HTTP handler (no network I/O)";
 
-        rootCommand.SetHandler(async (s3Client, workload, bucket, region, targetThroughput, chunkSize, partSize) =>
+        rootCommand.SetHandler(async (s3Client, workload, bucket, region, targetThroughput, chunkSize, partSize, useMock) =>
         {
             try
             {
@@ -113,10 +119,14 @@ Options:
                 {
                     Console.WriteLine($"Part size: {partSize.Value:N0} bytes");
                 }
+                if (useMock)
+                {
+                    Console.WriteLine("Mock mode: ENABLED (no network I/O)");
+                }
                 Console.WriteLine();
 
                 // Create benchmark runner
-                var benchmarkRunner = new TransferUtilityBenchmarkRunner(workloadConfig, bucket, region, targetThroughput, chunkSize, partSize);
+                var benchmarkRunner = new TransferUtilityBenchmarkRunner(workloadConfig, bucket, region, targetThroughput, chunkSize, partSize, useMock);
 
                 // Track overall start time for max duration check
                 var appStartTime = DateTimeOffset.UtcNow;
@@ -181,7 +191,7 @@ Options:
                 Environment.ExitCode = 1;
             }
         },
-        s3ClientArg, workloadArg, bucketArg, regionArg, targetThroughputArg, chunkSizeOption, partSizeOption);
+        s3ClientArg, workloadArg, bucketArg, regionArg, targetThroughputArg, chunkSizeOption, partSizeOption, mockOption);
 
         return await rootCommand.InvokeAsync(args);
     }

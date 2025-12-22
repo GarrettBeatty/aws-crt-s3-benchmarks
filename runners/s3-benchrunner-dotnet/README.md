@@ -34,6 +34,7 @@ Arguments:
 Optional Arguments:
 - `--chunk-size BYTES`: Internal buffer chunk size for downloads (default: 65536 bytes / 64KB)
 - `--part-size BYTES`: Part size for multipart downloads (default: 8388608 bytes / 8MB)
+- `--mock`: Use mock HTTP handler to eliminate network I/O (for CPU/memory benchmarking)
 
 Example:
 ```bash
@@ -44,6 +45,62 @@ Example with custom chunk and part sizes:
 ```bash
 dotnet run -c Release -- sdk-dotnet-tm workloads/download-1MB-1.run.json my-test-bucket us-west-2 100.0 --chunk-size 131072 --part-size 16777216
 ```
+
+Example with mock mode (no network I/O):
+```bash
+dotnet run -c Release -- sdk-dotnet-tm workloads/download-1MB-1.run.json my-test-bucket us-west-2 100.0 --mock --chunk-size 65536 --part-size 8388608
+```
+
+## Mock Mode (Network-Free Benchmarking)
+
+The `--mock` flag enables mock HTTP mode, which eliminates network I/O to isolate CPU and memory performance:
+
+### How It Works
+
+When `--mock` is enabled:
+1. A mock HTTP message handler intercepts all S3 API calls
+2. Mock responses simulate S3 multipart download behavior
+3. Mock data streams return fake data without actual network transfers
+4. The SDK's buffering, streaming, and memory management logic runs as normal
+
+### Use Cases
+
+**CPU/Memory Benchmarking:**
+- Isolate buffering and streaming overhead
+- Measure pure CPU performance without network variability
+- Test memory efficiency of different chunk/part size combinations
+- Profile ArrayPool usage and allocation patterns
+
+**Fast Iteration:**
+- No S3 costs or network latency
+- Reproducible results (same mock data every time)
+- Faster benchmark runs for large object sizes
+
+### Limitations
+
+- Only supports download operations (uploads still use actual S3 in mock mode)
+- Does not simulate network latency or bandwidth constraints
+- Results reflect CPU/memory performance, not real-world network throughput
+
+### Example Usage
+
+Pure CPU/memory benchmark with various chunk sizes:
+```bash
+# Benchmark 100MB download with different chunk sizes (no network)
+dotnet run -c Release -- sdk-dotnet-tm workloads/download-100MB-1.run.json bucket us-west-2 100.0 --mock --chunk-size 65536 --part-size 8388608
+dotnet run -c Release -- sdk-dotnet-tm workloads/download-100MB-1.run.json bucket us-west-2 100.0 --mock --chunk-size 131072 --part-size 8388608
+dotnet run -c Release -- sdk-dotnet-tm workloads/download-100MB-1.run.json bucket us-west-2 100.0 --mock --chunk-size 262144 --part-size 8388608
+```
+
+Compare mock mode vs. real network:
+```bash
+# Mock mode (CPU/memory only)
+dotnet run -c Release -- sdk-dotnet-tm workloads/download-50MB-1.run.json bucket us-west-2 100.0 --mock
+
+# Real network (includes network I/O)
+dotnet run -c Release -- sdk-dotnet-tm workloads/download-50MB-1.run.json bucket us-west-2 100.0
+```
+
 
 ## Output
 
