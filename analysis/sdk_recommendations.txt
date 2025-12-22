@@ -1,0 +1,55 @@
+// Optimal Chunk Size Selection Logic
+// Based on benchmark analysis
+
+if (partSize <= 1048576L) // 1MB
+{
+    chunkSize = 524288; // 512KB - 18.35 Gb/s
+}
+else if (partSize <= 2097152L) // 2MB
+{
+    chunkSize = 1048576; // 1MB - 18.73 Gb/s
+}
+else if (partSize <= 4194304L) // 4MB
+{
+    chunkSize = 1048576; // 1MB - 27.10 Gb/s
+}
+else if (partSize <= 8388608L) // 8MB
+{
+    chunkSize = 524288; // 512KB - 28.38 Gb/s
+}
+else if (partSize <= 16777216L) // 16MB
+{
+    chunkSize = 8388608; // 8MB - 40.60 Gb/s
+}
+else if (partSize <= 33554432L) // 32MB
+{
+    chunkSize = 8388608; // 8MB - 35.06 Gb/s
+}
+else if (partSize <= 67108864L) // 64MB
+{
+    chunkSize = 8388608; // 8MB - 23.67 Gb/s
+}
+else if (partSize <= 134217728L) // 128MB
+{
+    chunkSize = 67108864; // 64MB - 14.11 Gb/s
+}
+else if (partSize <= 268435456L) // 256MB
+{
+    chunkSize = 8388608; // 8MB - 7.51 Gb/s
+}
+else if (partSize <= 536870912L) // 512MB
+{
+    chunkSize = 536870912; // 512MB - 3.88 Gb/s
+}
+else if (partSize <= 1073741824L) // 1024MB
+{
+    chunkSize = 536870912; // 512MB - 1.97 Gb/s
+}
+else if (partSize <= 2147483648L) // 2048MB
+{
+    chunkSize = 4194304; // 4MB - 0.99 Gb/s
+}
+else // > 2048MB
+{
+    chunkSize = 67108864; // 64MB - 0.79 Gb/s
+}
