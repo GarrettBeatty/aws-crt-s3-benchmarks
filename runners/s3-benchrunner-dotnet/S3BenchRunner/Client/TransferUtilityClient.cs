@@ -111,7 +111,7 @@ public class TransferUtilityClient : IDisposable
                 if (_partSize.HasValue)
                 {
                     streamRequest.PartSize = _partSize.Value;
-                    streamRequest.MultipartDownloadType = MultipartDownloadType.Range;
+                    streamRequest.MultipartDownloadType = MultipartDownloadType.RANGE;
                 }
 
                 // // Open stream from S3 and copy to null stream

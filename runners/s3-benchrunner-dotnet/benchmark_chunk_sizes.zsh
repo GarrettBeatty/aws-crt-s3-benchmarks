@@ -100,7 +100,7 @@ for part_size in "${PART_SIZES[@]}"; do
         # Run benchmark and capture output
         output=$(dotnet run -c Release --project "$PROJECT_PATH" -- \
             sdk-dotnet-tm "$WORKLOAD_PATH" "$BUCKET_NAME" "$REGION" "$TARGET_THROUGHPUT" \
-            --part-size "$part_size" --chunk-size "$chunk_size" 2>&1)
+            --part-size "$part_size" --chunk-size "$chunk_size" --mock 2>&1)
         
         # Check if run was successful
         if [ $? -ne 0 ]; then
