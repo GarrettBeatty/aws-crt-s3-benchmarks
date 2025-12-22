@@ -1,0 +1,83 @@
+// Optimal Chunk Size Selection Logic
+// Based on benchmark analysis
+
+if (partSize <= 8192L) // 8KB
+{
+    chunkSize = 8192; // 8KB - 11.34 Gb/s
+}
+else if (partSize <= 16384L) // 16KB
+{
+    chunkSize = 16384; // 16KB - 17.89 Gb/s
+}
+else if (partSize <= 32768L) // 32KB
+{
+    chunkSize = 32768; // 32KB - 24.81 Gb/s
+}
+else if (partSize <= 65536L) // 64KB
+{
+    chunkSize = 65536; // 64KB - 31.34 Gb/s
+}
+else if (partSize <= 131072L) // 128KB
+{
+    chunkSize = 131072; // 128KB - 42.84 Gb/s
+}
+else if (partSize <= 262144L) // 256KB
+{
+    chunkSize = 262144; // 256KB - 44.22 Gb/s
+}
+else if (partSize <= 524288L) // 512KB
+{
+    chunkSize = 262144; // 256KB - 44.20 Gb/s
+}
+else if (partSize <= 1048576L) // 1MB
+{
+    chunkSize = 1048576; // 1MB - 55.98 Gb/s
+}
+else if (partSize <= 2097152L) // 2MB
+{
+    chunkSize = 1048576; // 1MB - 55.79 Gb/s
+}
+else if (partSize <= 4194304L) // 4MB
+{
+    chunkSize = 4194304; // 4MB - 68.82 Gb/s
+}
+else if (partSize <= 8388608L) // 8MB
+{
+    chunkSize = 4194304; // 4MB - 69.80 Gb/s
+}
+else if (partSize <= 16777216L) // 16MB
+{
+    chunkSize = 4194304; // 4MB - 69.22 Gb/s
+}
+else if (partSize <= 33554432L) // 32MB
+{
+    chunkSize = 4194304; // 4MB - 69.24 Gb/s
+}
+else if (partSize <= 67108864L) // 64MB
+{
+    chunkSize = 4194304; // 4MB - 68.94 Gb/s
+}
+else if (partSize <= 134217728L) // 128MB
+{
+    chunkSize = 4194304; // 4MB - 68.65 Gb/s
+}
+else if (partSize <= 268435456L) // 256MB
+{
+    chunkSize = 4194304; // 4MB - 67.92 Gb/s
+}
+else if (partSize <= 536870912L) // 512MB
+{
+    chunkSize = 4194304; // 4MB - 69.32 Gb/s
+}
+else if (partSize <= 1073741824L) // 1024MB
+{
+    chunkSize = 4194304; // 4MB - 69.84 Gb/s
+}
+else if (partSize <= 2147483648L) // 2048MB
+{
+    chunkSize = 4194304; // 4MB - 69.62 Gb/s
+}
+else // > 2048MB
+{
+    chunkSize = 4194304; // 4MB - 68.23 Gb/s
+}

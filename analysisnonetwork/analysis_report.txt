@@ -1,0 +1,129 @@
+================================================================================
+S3 CHUNK SIZE BENCHMARK ANALYSIS REPORT
+================================================================================
+
+OVERALL STATISTICS
+--------------------------------------------------------------------------------
+Total configurations tested: 182
+Part sizes tested: 20
+Chunk sizes tested: 15
+Best overall throughput: 69.84 Gb/s
+Worst overall throughput: 11.13 Gb/s
+
+OPTIMAL CONFIGURATIONS
+--------------------------------------------------------------------------------
+Part Size       Optimal Chunk   Throughput      Std Dev        
+--------------------------------------------------------------------------------
+8KB             8KB             11.34 Gb/s       ±0.62 Gb/s
+16KB            16KB            17.89 Gb/s       ±2.31 Gb/s
+32KB            32KB            24.81 Gb/s       ±4.59 Gb/s
+64KB            64KB            31.34 Gb/s       ±7.37 Gb/s
+128KB           128KB           42.84 Gb/s       ±14.87 Gb/s
+256KB           256KB           44.22 Gb/s       ±17.13 Gb/s
+512KB           256KB           44.20 Gb/s       ±17.04 Gb/s
+1MB             1MB             55.98 Gb/s       ±17.26 Gb/s
+2MB             1MB             55.79 Gb/s       ±17.17 Gb/s
+4MB             4MB             68.82 Gb/s       ±16.51 Gb/s
+8MB             4MB             69.80 Gb/s       ±16.67 Gb/s
+16MB            4MB             69.22 Gb/s       ±16.53 Gb/s
+32MB            4MB             69.24 Gb/s       ±16.52 Gb/s
+64MB            4MB             68.94 Gb/s       ±16.52 Gb/s
+128MB           4MB             68.65 Gb/s       ±16.47 Gb/s
+256MB           4MB             67.92 Gb/s       ±16.20 Gb/s
+512MB           4MB             69.32 Gb/s       ±16.54 Gb/s
+1024MB          4MB             69.84 Gb/s       ±16.73 Gb/s
+2048MB          4MB             69.62 Gb/s       ±16.71 Gb/s
+5120MB          4MB             68.23 Gb/s       ±16.40 Gb/s
+
+PERFORMANCE TIPPING POINTS
+--------------------------------------------------------------------------------
+Points where increasing chunk size shows diminishing returns (<5% improvement)
+
+Part Size 256KB:
+  Tipping point at chunk size: 192KB
+  Throughput: 40.07 Gb/s
+  Previous improvement: -7.3%
+
+Part Size 512KB:
+  Tipping point at chunk size: 192KB
+  Throughput: 39.51 Gb/s
+  Previous improvement: -8.3%
+
+Part Size 1MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 38.67 Gb/s
+  Previous improvement: -6.0%
+
+Part Size 2MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 37.96 Gb/s
+  Previous improvement: -11.1%
+
+Part Size 4MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 39.80 Gb/s
+  Previous improvement: -3.9%
+
+Part Size 8MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 39.33 Gb/s
+  Previous improvement: -8.6%
+
+Part Size 16MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 39.31 Gb/s
+  Previous improvement: -8.0%
+
+Part Size 32MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 39.56 Gb/s
+  Previous improvement: -4.3%
+
+Part Size 64MB:
+  Tipping point at chunk size: 256KB
+  Throughput: 43.79 Gb/s
+  Previous improvement: -8.5%
+
+Part Size 128MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 39.66 Gb/s
+  Previous improvement: -5.5%
+
+Part Size 256MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 39.58 Gb/s
+  Previous improvement: -8.6%
+
+Part Size 512MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 39.95 Gb/s
+  Previous improvement: -4.4%
+
+Part Size 1024MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 38.85 Gb/s
+  Previous improvement: -7.3%
+
+Part Size 2048MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 38.48 Gb/s
+  Previous improvement: -11.0%
+
+Part Size 5120MB:
+  Tipping point at chunk size: 192KB
+  Throughput: 38.65 Gb/s
+  Previous improvement: -7.8%
+
+KEY INSIGHTS
+--------------------------------------------------------------------------------
+1. LOH Threshold Analysis (85KB):
+   - 4 optimal configs use chunks < 85KB (stay off LOH)
+   - 16 optimal configs use chunks ≥ 85KB (may trigger LOH)
+
+2. Throughput Range:
+   - Minimum optimal: 11.34 Gb/s
+   - Maximum optimal: 69.84 Gb/s
+   - Average optimal: 54.40 Gb/s
+   - Improvement range: 516.1%
+
+================================================================================
