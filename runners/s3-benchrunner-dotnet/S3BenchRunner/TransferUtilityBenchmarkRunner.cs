@@ -1,19 +1,22 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using S3BenchRunner.Client;
 using S3BenchRunner.Models;
 
-namespace S3BenchRunner;
-
-public class TransferUtilityBenchmarkRunner : BenchmarkRunner
+namespace S3BenchRunner
 {
-    private readonly TransferUtilityClient _client;
-
-    public TransferUtilityBenchmarkRunner(WorkloadConfig config, string bucket, string region, double targetThroughputGbps, bool withResponseApis)
-        : base(config, bucket, region)
+    public class TransferUtilityBenchmarkRunner : BenchmarkRunner
     {
-        _client = new TransferUtilityClient(bucket, region, config.FilesOnDisk, config.Tasks, withResponseApis);
-    }
+        private readonly TransferUtilityClient _client;
 
-    public override async Task RunAsync()
+        public TransferUtilityBenchmarkRunner(WorkloadConfig config, string bucket, string region, double targetThroughputGbps, bool withResponseApis)
+            : base(config, bucket, region)
+        {
+            _client = new TransferUtilityClient(bucket, region, config.FilesOnDisk, config.Tasks, withResponseApis);
+        }
+
+        public override async Task RunAsync()
         {
             // Execute ALL downloads in parallel (like Java CRT does)
             var downloadTasks = Config.Tasks
@@ -41,8 +44,9 @@ public class TransferUtilityBenchmarkRunner : BenchmarkRunner
         }
 
 
-    public void Dispose()
-    {
-        _client.Dispose();
+        public void Dispose()
+        {
+            _client.Dispose();
+        }
     }
 }

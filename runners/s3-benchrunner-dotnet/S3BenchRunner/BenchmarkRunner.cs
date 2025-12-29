@@ -1,42 +1,45 @@
+using System.IO;
+using System.Threading.Tasks;
 using S3BenchRunner.Models;
 
-namespace S3BenchRunner;
-
-public abstract class BenchmarkRunner
+namespace S3BenchRunner
 {
-    protected WorkloadConfig Config { get; }
-    protected string Bucket { get; }
-    protected string Region { get; }
-
-    protected BenchmarkRunner(WorkloadConfig config, string bucket, string region)
+    public abstract class BenchmarkRunner
     {
-        Config = config;
-        Bucket = bucket;
-        Region = region;
-    }
+        protected WorkloadConfig Config { get; }
+        protected string Bucket { get; }
+        protected string Region { get; }
 
-    public abstract Task RunAsync();
-
-    public void PrepareRun()
-    {
-        // Preparation work between runs
-        foreach (var task in Config.Tasks)
+        protected BenchmarkRunner(WorkloadConfig config, string bucket, string region)
         {
-            if (task.Action == "download")
+            Config = config;
+            Bucket = bucket;
+            Region = region;
+        }
+
+        public abstract Task RunAsync();
+
+        public void PrepareRun()
+        {
+            // Preparation work between runs
+            foreach (var task in Config.Tasks)
             {
-                var path = task.LocalPath;
-                var directory = Path.GetDirectoryName(path);
-                
-                // Create directory if it doesn't exist
-                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                if (task.Action == "download")
                 {
-                    Directory.CreateDirectory(directory);
-                }
-                
-                // Delete file if it exists
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
+                    var path = task.LocalPath;
+                    var directory = Path.GetDirectoryName(path);
+                    
+                    // Create directory if it doesn't exist
+                    if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+                    
+                    // Delete file if it exists
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
                 }
             }
         }

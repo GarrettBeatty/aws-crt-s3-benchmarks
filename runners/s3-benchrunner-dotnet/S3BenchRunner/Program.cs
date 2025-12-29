@@ -1,15 +1,16 @@
-﻿using System.CommandLine;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.CommandLine;
 using Newtonsoft.Json;
 using S3BenchRunner.Models;
 
-namespace S3BenchRunner;
-
-
-
-public class Program
+namespace S3BenchRunner
 {
-
-    public static async Task<int> Main(string[] args)
+    public class Program
+    {
+        public static async Task<int> Main(string[] args)
     {
         // Amazon.AWSConfigs.LoggingConfig.LogMetrics = false;
         // Amazon.AWSConfigs.LoggingConfig.LogResponses = Amazon.ResponseLoggingOption.Never;
@@ -77,7 +78,7 @@ Arguments:
                 }
 
                 // Load and validate workload config
-                var workloadJson = await File.ReadAllTextAsync(workload.FullName);
+                var workloadJson = File.ReadAllText(workload.FullName);
                 var workloadConfig = JsonConvert.DeserializeObject<WorkloadConfig>(workloadJson)
                     ?? throw new InvalidOperationException("Failed to parse workload config");
 
@@ -167,5 +168,6 @@ Arguments:
         s3ClientArg, workloadArg, bucketArg, regionArg, targetThroughputArg, withResponseApisArg);
 
         return await rootCommand.InvokeAsync(args);
+        }
     }
 }
